@@ -216,3 +216,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
   addMessage("Hoi! Ik ben i2ai. Waar kan ik je mee helpen?", "bot");
 });
+
+//-------------------------------------------------------------
+// Newsletter Signup Handler
+// Koppelt het formulier op /nieuwsbrief aan de n8n webhook
+//-------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", function () {
+  if (!window.location.pathname.includes("nieuwsbrief")) return;
+
+  const form = document.querySelector("form");
+  if (!form) return;
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const emailInput =
+      document.getElementById("Email") || form.querySelector("input");
+    const btn = form.querySelector('button[type="submit"]');
+    const email = emailInput.value.trim();
+
+    if (!email) return;
+
+    btn.textContent = "Bezig...";
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(
+        "https://n8n.in2ai.nl/webhook/newsletter-signup",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email, bron: "website" }),
+        }
+      );
+      const data = await res.json();
+
+      emailInput.value = "";
+      btn.textContent = "\u2705 Aangemeld!";
+      btn.style.backgroundColor = "#10b981";
+
+      setTimeout(function () {
+        btn.textContent = "Aanmelden";
+        btn.disabled = false;
+        btn.style.backgroundColor = "";
+      }, 3000);
+    } catch (err) {
+      btn.textContent = "\u274c Fout, probeer opnieuw";
+      btn.disabled = false;
+      setTimeout(function () {
+        btn.textContent = "Aanmelden";
+      }, 3000);
+    }
+  });
+});
