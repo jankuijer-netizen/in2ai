@@ -228,12 +228,13 @@ document.addEventListener("DOMContentLoaded", function () {
     var form = document.querySelector("form");
     if (!form) return;
 
-    form.addEventListener("submit", async function (e) {
+    var btn = form.querySelector('button[type="submit"]');
+    var emailInput = document.getElementById("Email") || form.querySelector("input");
+
+    // Intercept button click (Hostinger uses click, not form submit)
+    btn.addEventListener("click", async function (e) {
       e.preventDefault();
-      e.stopPropagation();
-      var emailInput =
-        document.getElementById("Email") || form.querySelector("input");
-      var btn = form.querySelector('button[type="submit"]');
+      e.stopImmediatePropagation();
       var email = emailInput.value.trim();
 
       if (!email) return;
@@ -268,7 +269,13 @@ document.addEventListener("DOMContentLoaded", function () {
           btn.textContent = "Aanmelden";
         }, 3000);
       }
-    }, true);  // capture phase ‚Äî voorkomt dat Hostinger's handler eerst fired
+    }, true);  // capture phase ‚Äî voorkomt dat Hostinger's click handler eerst fired
+
+    // Also block form submit as fallback
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }, true);
   }
 
   if (document.readyState === "loading") {
