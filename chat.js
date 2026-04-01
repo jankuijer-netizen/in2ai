@@ -230,6 +230,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
+      e.stopPropagation();
       var emailInput =
         document.getElementById("Email") || form.querySelector("input");
       var btn = form.querySelector('button[type="submit"]');
@@ -267,7 +268,7 @@ document.addEventListener("DOMContentLoaded", function () {
           btn.textContent = "Aanmelden";
         }, 3000);
       }
-    });
+    }, true);  // capture phase ‚Äî voorkomt dat Hostinger's handler eerst fired
   }
 
   if (document.readyState === "loading") {
